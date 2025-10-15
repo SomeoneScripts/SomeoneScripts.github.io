@@ -1,32 +1,29 @@
-	html, body {
-	    height: 100%;
-	    margin: 0;
-	}
+	html, body {
+	    height: 100%;
+	    margin: 0;
+	}
+	
+	.Body {
+	    background-image: url('https://someonescripts.github.io/Main/Websites%20Images/Penitent.jpg');
+	    background-size: 100% 100%;
+	    background-repeat: repeat;
+	    background-position: top center;
+	    font-family: 'Fredoka One', cursive;
+	    font-size: 18px;
+	    color: white;
+	    -webkit-text-stroke: 1px black;
+	}
+
+	.Social img {
+	    width: 50px;
+	    height: 50px;
+	    cursor: pointer;
+	    border-radius: 12px;
+	}
 	
-	.Body {
-	    background-image: url('https://someonescripts.github.io/Main/Websites%20Images/Penitent.jpg');
-	    background-size: auto 100%;
-	    background-repeat: repeat;
-	    background-position: top center;
-	    font-family: 'Fredoka One', cursive;
-	    font-size: 18px;
-	    color: white;
+	.SocialMedia1 {
+	    font-family: 'Fredoka One', cursive;
+	    font-size: 26px;
+	    color: white;
 	    -webkit-text-stroke: 1px black;
 	}
-	.Social img {
-	    width: 50px;
-	    height: 50px;
-	    cursor: pointer;
-	    border-radius: 12px;
-	}
-	.SocialMedia1 {
-	    font-family: 'Fredoka One', cursive;
-	    font-size: 26px;
-	    color: white;
-	    -webkit-text-stroke: 1px black;
-
-	}
-
-
-
-
