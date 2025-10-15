@@ -5,7 +5,7 @@
 	
 	.Body {
 	    background-image: url('https://someonescripts.github.io/Main/Websites%20Images/Penitent.jpg');
-	    background-size: cover;
+	    background-size: auto 100%;
 	    background-repeat: repeat-y;
 	    background-position: top center;
 	    min-height: 100vh;
@@ -25,4 +25,5 @@
 	    font-size: 26px;
 	    color: white;
 	    -webkit-text-stroke: 1px black;
+
 	}
