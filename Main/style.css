@@ -1,6 +1,6 @@
 	html, body {
 	    height: 100%;
-	    margin: 0;
+	    margin: 100%;
 	}
 	
 	.Body {
@@ -25,4 +25,5 @@
 	    font-size: 26px;
 	    color: white;
 	    -webkit-text-stroke: 1px black;
+
 	}
