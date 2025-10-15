@@ -6,8 +6,8 @@
 	.Body {
 	    background-image: url('https://someonescripts.github.io/Main/Websites%20Images/Penitent.jpg');
 	    background-size: cover;
-	    background-repeat: no-repeat;
-	    background-position: center;
+	    background-repeat: repeat-y;
+	    background-position: top center;
 	    min-height: 100vh;
 	    font-family: 'Fredoka One', cursive;
 	    font-size: 18px;
@@ -25,5 +25,4 @@
 	    font-size: 26px;
 	    color: white;
 	    -webkit-text-stroke: 1px black;
-
 	}
