@@ -4,11 +4,11 @@
 	}
 	
 	.Body {
-	    background-color: rgb(122, 109, 142);
 	    background-image: url('https://someonescripts.github.io/Main/Websites%20Images/Penitent.jpg');
 	    background-size: cover;
 	    background-repeat: no-repeat;
 	    background-position: center;
+	    min-height: 100vh;
 	    font-family: 'Fredoka One', cursive;
 	    font-size: 18px;
 	    color: white;
@@ -25,6 +25,4 @@
 	    font-size: 26px;
 	    color: white;
 	    -webkit-text-stroke: 1px black;
-
 	}
-
