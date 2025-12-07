@@ -10,7 +10,7 @@ function ChangeBackground() {
   recent.push(index);
   if (recent.length > maxRecent) recent.shift();
 
-  document.body.style.backgroundImage = `url('https://raw.githubusercontent.com/SomeoneScripts/ReadIt/main/Images/Background${index}.png')`;
+  document.body.style.backgroundImage = `url('https://raw.githubusercontent.com/SomeoneScripts/SomeoneScripts.github.io/main/Images/Background${index}.png')`;
 }
 
 ChangeBackground();
