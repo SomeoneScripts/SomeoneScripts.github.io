@@ -1,9 +1,10 @@
 body {
 	background-size: cover;
-	background-position: center;
+	background-position: top-center;
 	transition: background-image 1s ease;
 	color: rgb(0, 0, 0);
 	font-family: "Fredoka One", normal;
 	font-size: 24px;
 
 }
+
