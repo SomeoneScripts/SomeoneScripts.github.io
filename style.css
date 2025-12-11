@@ -1,6 +1,6 @@
 body {
 	background-size: cover;
-	background-position: center;
+	background-position: top;
 	transition: background-image 1s ease;
 	color: rgb(0, 0, 0);
 	font-family: "Fredoka One", normal;
@@ -25,4 +25,5 @@ body {
 .item h6 {
   margin-top: 10px;
   font-size: 17px;
+
 }
