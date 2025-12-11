@@ -1,6 +1,6 @@
 body {
-	background-size: cover;
-	background-position: top;
+	background-size: 100%;
+	background-position: bottom;
 	transition: background-image 1s ease;
 	color: rgb(0, 0, 0);
 	font-family: "Fredoka One", normal;
@@ -27,3 +27,4 @@ body {
   font-size: 17px;
 
 }
+
