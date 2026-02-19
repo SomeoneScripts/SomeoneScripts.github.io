@@ -1,41 +1,277 @@
 <!DOCTYPE html>
-<html>
-	<head>
-		<title>Read It</title>
-		
-		<meta charset="utf-8">
-		
-		<meta property="og:title" content="Read It">
-		<meta property="og:description" content="Simple Lyrical Thoughts.">
-		<meta property="og:image" content="https://raw.githubusercontent.com/SomeoneScripts/SomeoneScripts.github.io/main/Images/FavIcon.jpg">
-		<meta property="og:url" content="https://someonescripts.github.io/">
-		<meta property="og:type" content="website">
-		
-		<meta name="twitter:card" content="summary_large_image">
-		<meta name="twitter:title" content="Read Ite">
-		<meta name="twitter:description" content="Simple Lyrical Thoughts.">
-		<meta name="twitter:image" content="https://raw.githubusercontent.com/SomeoneScripts/SomeoneScripts.github.io/main/Images/FavIcon.jpg">
-		
-		<link rel="icon" href="https://raw.githubusercontent.com/SomeoneScripts/SomeoneScripts.github.io/main/Images/FavIcon.jpg" type="image/png">
-		
-		<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
-		
-		<link rel="stylesheet" href="style.css">
-		
-	</head>
-	<body>
-		<a href="https://www.instagram.com/olk.lucas2" target="_blank">
-		  <button style="padding: 8px 12px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
-		    Sugestões Aqui
-		  </button>
-		</a>
-		<script src="script.js"></script>
-		<div id="container">
-		  <div>
-			<div class="item">
-			O que é o Amor?
-			<h6>O amor é como um pássaro.<br>Se ele te ama, volta por vontade.<br>Se você o prende, foge no primeiro descuido.<br></h6>
-		</div>
-		<div>
-	</body>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fragmentos</title>
+
+    <meta property="og:title" content="Fragmentos">
+    <meta property="og:description" content="Uma coleção minimalista de fragmentos poéticos.">
+    <meta property="og:image" content="https://SomeoneScripts.github.io/Fragmentos/cover.png">
+    <meta property="og:url" content="https://SomeoneScripts.github.io/Fragmentos/">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            background-color: rgb(40, 40, 40);
+            color: #eee;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        #splash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgb(40, 40, 40);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            transition: opacity 1s ease-in-out, visibility 1s;
+        }
+
+        #enter-button {
+            font-family: 'Georgia', serif;
+            font-size: calc(1.2rem + 3px);
+            letter-spacing: 10px;
+            text-transform: lowercase;
+            font-style: italic;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: #eee;
+            opacity: 0.6;
+            transition: opacity 0.5s, letter-spacing 0.8s;
+        }
+
+        #enter-button:hover {
+            opacity: 1;
+            letter-spacing: 15px;
+        }
+
+        .main-container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 80px 20px 60px 20px;
+        }
+
+        #content-wrapper {
+            display: none;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 1px solid #555;
+            margin-bottom: 50px;
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            font-weight: normal;
+            font-size: calc(2em + 3px);
+            letter-spacing: 5px;
+            margin: 0;
+        }
+
+        .poetry-item {
+            margin-bottom: 40px;
+            position: relative;
+            padding: 20px;
+            background: transparent;
+        }
+
+        .poetry-item:hover .action-buttons {
+            opacity: 1;
+        }
+
+        h2 {
+            font-size: calc(1.5em + 3px);
+            margin-bottom: 18px;
+            font-weight: normal;
+            color: #fff;
+        }
+
+        .poetry-body {
+            white-space: pre-wrap;
+            font-style: italic;
+            font-size: calc(1.1em + 3px);
+            color: #ccc;
+            border-left: 1px solid #666;
+            padding-left: 25px;
+        }
+
+        .credits {
+            display: block;
+            margin-top: 20px;
+            font-size: calc(0.8em + 3px);
+            color: #888;
+        }
+
+        .action-buttons {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #aaa;
+            padding: 5px 10px;
+            font-size: 0.7em;
+            border-radius: 4px;
+            cursor: pointer;
+            text-transform: lowercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        /* Modal / Frame Styles */
+        #modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(30, 30, 30, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        #modal-content {
+            max-width: 600px;
+            padding: 40px;
+            text-align: left;
+            line-height: 1.8;
+            font-size: calc(1rem + 2px);
+            color: #ddd;
+            font-style: italic;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+<div id="splash">
+    <button id="enter-button" onclick="enter()">entrar...</button>
+</div>
+
+<div id="modal-overlay" onclick="closeReflection()">
+    <span class="close-modal">&times;</span>
+    <div id="modal-content"></div>
+</div>
+
+<div class="main-container">
+    <div id="content-wrapper">
+        <header>
+            <h1>Fragmentos</h1>
+        </header>
+        <div id="poetry-wall"></div>
+    </div>
+</div>
+
+<script>
+    const GITHUB_URL = 'https://SomeoneScripts.github.io/Fragmentos/Poems.json';
+    let currentPoems = [];
+
+    async function fetchPoems() {
+        try {
+            const response = await fetch(GITHUB_URL);
+            currentPoems = await response.json();
+            renderWall(currentPoems);
+        } catch (error) {
+            console.error('Erro ao carregar poesias:', error);
+        }
+    }
+
+    function enter() {
+        const splash = document.getElementById('splash');
+        splash.style.opacity = '0';
+        setTimeout(() => {
+            splash.style.visibility = 'hidden';
+            const wrapper = document.getElementById('content-wrapper');
+            wrapper.style.display = 'block';
+            setTimeout(() => wrapper.style.opacity = '1', 50);
+            fetchPoems();
+        }, 1000);
+    }
+
+    function copyContent(text, element) {
+        navigator.clipboard.writeText(text).then(() => {
+            const originalLabel = element.innerText;
+            element.innerText = 'copiado!';
+            setTimeout(() => {
+                element.innerText = originalLabel;
+            }, 2000);
+        });
+    }
+
+    function openReflection(index) {
+        const poem = currentPoems[index];
+        if (poem.reflection) {
+            const modal = document.getElementById('modal-overlay');
+            const content = document.getElementById('modal-content');
+            content.innerText = poem.reflection;
+            modal.style.display = 'flex';
+            setTimeout(() => modal.style.opacity = '1', 10);
+        }
+    }
+
+    function closeReflection() {
+        const modal = document.getElementById('modal-overlay');
+        modal.style.opacity = '0';
+        setTimeout(() => modal.style.display = 'none', 500);
+    }
+
+    function renderWall(poemsList) {
+        const wall = document.getElementById('poetry-wall');
+        wall.innerHTML = '';
+        poemsList.forEach((item, index) => {
+            const article = document.createElement('article');
+            article.className = 'poetry-item';
+            
+            let buttonsHtml = `<button class="btn" onclick="copyContent(\`${item.content}\`, this)">copiar</button>`;
+            if (item.reflection) {
+                buttonsHtml += `<button class="btn" onclick="event.stopPropagation(); openReflection(${index})">ler mais</button>`;
+            }
+
+            article.innerHTML = `
+                <div class="action-buttons">${buttonsHtml}</div>
+                <h2>${item.title}</h2>
+                <div class="poetry-body">${item.content}</div>
+                <span class="credits">créditos: ${item.credits}</span>
+            `;
+            wall.appendChild(article);
+        });
+    }
+</script>
+
+</body>
 </html>
