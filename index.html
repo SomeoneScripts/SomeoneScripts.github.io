@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webhook Manager - Advanced Control</title>
+    <style>
+        /* Base e Variáveis */
+        :root {
+            --bg-main: #1e1f22;
+            --bg-panel: #2b2d31;
+            --bg-input: #1e1f22;
+            --text-main: #dbdee1;
+            --text-muted: #949ba4;
+            --accent: #5865F2;
+            --accent-hover: #4752C4;
+            --danger: #da373c;
+            --success: #23a559;
+            --border: #313338;
+        }
+
+        body {
+            font-family: 'gg sans', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            box-sizing: border-box;
+            gap: 15px;
+        }
+
+        /* View Controller (Abas) */
+        .view-controls {
+            display: flex;
+            gap: 10px;
+            background: var(--bg-panel);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .tab-btn {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid transparent;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-btn.active {
+            background: var(--bg-input);
+            color: #fff;
+            border-color: var(--border);
+            font-weight: bold;
+        }
+
+        /* Layout Container */
+        .layout-container {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            min-height: 0; /* Permite scroll interno */
+        }
+
+        .panel {
+            background: var(--bg-panel);
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            overflow-y: auto;
+            transition: opacity 0.3s ease;
+        }
+
+        .editor-panel {
+            flex: 1;
+            display: block; /* Estado inicial */
+        }
+
+        .preview-panel {
+            flex: 1;
+            display: flex; /* Estado inicial */
+            flex-direction: column;
+            background: var(--bg-main);
+        }
+
+        h1, h2 {
+            color: #fff;
+            margin-top: 0;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Formulários */
+        fieldset {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0,0,0,0.1);
+        }
+
+        legend { font-weight: 600; color: var(--text-muted); font-size: 12px; text-transform: uppercase; padding: 0 8px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .full { grid-column: 1 / -1; }
+
+        label { display: block; font-size: 12px; margin-bottom: 6px; color: var(--text-muted); font-weight: 600; }
+        input, textarea, select {
+            width: 100%; background: var(--bg-input); border: 1px solid var(--border); padding: 10px; color: var(--text-main);
+            border-radius: 4px; box-sizing: border-box; outline: none; font-family: inherit; transition: border-color 0.2s;
+        }
+        input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+
+        /* Botões Base */
+        button { font-family: inherit; font-weight: 600; cursor: pointer; border: none; border-radius: 4px; transition: background 0.2s; }
+        .btn-add { background: #4e5058; color: white; padding: 10px; width: 100%; margin-bottom: 15px; }
+        .btn-add:hover { background: #6d6f78; }
+        .btn-del { background: var(--danger); color: white; padding: 10px; width: 100%; }
+        .btn-send {
+            width: 100%; padding: 15px; background: var(--accent); color: white; font-size: 16px; margin-top: 10px;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-send:hover { background: var(--accent-hover); }
+
+        .field-row {
+            display: grid; grid-template-columns: 1fr 1fr 80px 40px; gap: 10px; align-items: end; background: var(--bg-input);
+            padding: 12px; border-radius: 6px; margin-bottom: 10px; border: 1px solid var(--border);
+        }
+
+        #status { margin-top: 15px; padding: 12px; text-align: center; border-radius: 4px; display: none; font-weight: bold; font-size: 14px; }
+
+        /* Mockup do Discord (Preview) */
+        .discord-mockup { display: flex; gap: 16px; margin-top: 20px; }
+        .d-avatar { width: 40px; height: 40px; border-radius: 50%; background-color: var(--accent); background-size: cover; background-position: center; flex-shrink: 0; }
+        .d-message-body { flex: 1; min-width: 0; }
+        .d-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+        .d-username { font-weight: 600; color: #fff; font-size: 16px; }
+        .d-timestamp { font-size: 12px; color: var(--text-muted); }
+        .d-content { font-size: 14px; margin-bottom: 8px; white-space: pre-wrap; word-break: break-word; }
+
+        .d-embed { display: flex; background: var(--bg-panel); border-left: 4px solid var(--bg-input); border-radius: 4px; padding: 12px 16px 16px 16px; max-width: 520px; flex-direction: column; gap: 8px; }
+        .d-embed-author { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .d-embed-author-icon { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; display: none; }
+        .d-embed-author-name { font-size: 14px; font-weight: 600; color: #fff; }
+        .d-embed-title { font-size: 16px; font-weight: 600; color: #00A8FC; text-decoration: none; }
+        .d-embed-title:hover { text-decoration: underline; }
+        .d-embed-desc { font-size: 14px; white-space: pre-wrap; word-break: break-word; }
+        .d-embed-fields { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+        .d-embed-field { flex: 1 1 100%; min-width: 0; }
+        .d-embed-field.inline { flex: 1 1 calc(33% - 12px); min-width: 150px; }
+        .d-embed-field-name { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+        .d-embed-field-value { font-size: 14px; white-space: pre-wrap; }
+        .d-embed-image { max-width: 100%; border-radius: 4px; margin-top: 12px; display: none; }
+        .d-embed-thumbnail { max-width: 80px; max-height: 80px; border-radius: 4px; display: none; float: right; margin-left: 16px; }
+        .d-embed-footer { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+        .d-embed-footer-icon { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; display: none; }
+        .d-embed-footer-text { font-size: 12px; color: var(--text-muted); }
+        .d-embed-grid { display: flex; width: 100%; }
+        .d-embed-main { flex: 1; min-width: 0; }
+    </style>
+</head>
+<body>
+
+<div class="view-controls">
+    <button class="tab-btn" id="btn-edit" onclick="switchView('edit')">Apenas Edição</button>
+    <button class="tab-btn" id="btn-preview" onclick="switchView('preview')">Apenas Visualização</button>
+    <button class="tab-btn active" id="btn-split" onclick="switchView('split')">Visão Dividida</button>
+</div>
+
+<div class="layout-container">
+    <div class="panel editor-panel" id="panel-edit">
+        <h1>Configuração do Webhook</h1>
+
+        <fieldset>
+            <legend>Conexão & Identidade</legend>
+            <div class="grid">
+                <div class="full"><label>URL do Webhook *</label><input type="text" id="url" placeholder="https://discord.com/api/webhooks/..."></div>
+                <div><label>Nome do Bot</label><input type="text" id="username" value="Webhook System" oninput="updatePreview()"></div>
+                <div><label>URL do Avatar</label><input type="text" id="avatar_url" oninput="updatePreview()"></div>
+                <div class="full"><label>Mensagem Principal (Fora do Embed)</label><textarea id="content" rows="2" oninput="updatePreview()"></textarea></div>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Embed: Cabeçalho & Descrição</legend>
+            <div class="grid">
+                <div class="full"><label>Cor da Barra Lateral</label><input type="color" id="color" value="#5865F2" oninput="updatePreview()" style="height: 38px; padding: 2px;"></div>
+                <div><label>Nome do Autor</label><input type="text" id="auth_name" oninput="updatePreview()"></div>
+                <div><label>Ícone do Autor (URL)</label><input type="text" id="auth_icon" oninput="updatePreview()"></div>
+                <div><label>Título</label><input type="text" id="title" oninput="updatePreview()"></div>
+                <div><label>URL do Título</label><input type="text" id="title_url" oninput="updatePreview()"></div>
+                <div class="full"><label>Descrição</label><textarea id="description" rows="4" oninput="updatePreview()"></textarea></div>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Embed: Fields (Campos Adicionais)</legend>
+            <button class="btn-add" onclick="addField()">+ Adicionar Campo</button>
+            <div id="fields-container"></div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Embed: Mídia & Rodapé</legend>
+            <div class="grid">
+                <div><label>Thumbnail (Imagem Menor)</label><input type="text" id="thumbnail" oninput="updatePreview()"></div>
+                <div><label>Imagem Principal</label><input type="text" id="image" oninput="updatePreview()"></div>
+                <div><label>Texto do Rodapé</label><input type="text" id="footer_text" oninput="updatePreview()"></div>
+                <div><label>Ícone do Rodapé (URL)</label><input type="text" id="footer_icon" oninput="updatePreview()"></div>
+                <div class="full"><label>Carimbo de Tempo (Timestamp)</label><select id="timestamp" onchange="updatePreview()"><option value="none">Desativado</option><option value="now">Horário Atual</option></select></div>
+            </div>
+        </fieldset>
+
+        <button class="btn-send" onclick="disparar()">Transmitir Payload</button>
+        <div id="status"></div>
+    </div>
+
+    <div class="panel preview-panel" id="panel-preview">
+        <h2>Visualização em Tempo Real</h2>
+        
+        <div class="discord-mockup">
+            <div class="d-avatar" id="prev-avatar"></div>
+            <div class="d-message-body">
+                <div class="d-header">
+                    <span class="d-username" id="prev-username">Webhook System</span>
+                    <span class="d-timestamp">Hoje às 12:00</span>
+                </div>
+                
+                <div class="d-content" id="prev-content"></div>
+
+                <div class="d-embed" id="prev-embed-container" style="display: none;">
+                    <div class="d-embed-grid">
+                        <div class="d-embed-main">
+                            <div class="d-embed-author" id="prev-auth-container" style="display: none;">
+                                <img class="d-embed-author-icon" id="prev-auth-icon" src="" alt="">
+                                <span class="d-embed-author-name" id="prev-auth-name"></span>
+                            </div>
+
+                            <a href="#" class="d-embed-title" id="prev-title" style="display: none;" target="_blank"></a>
+                            <div class="d-embed-desc" id="prev-desc" style="display: none;"></div>
+
+                            <div class="d-embed-fields" id="prev-fields"></div>
+                            <img class="d-embed-image" id="prev-image" src="" alt="">
+                        </div>
+                        <img class="d-embed-thumbnail" id="prev-thumbnail" src="" alt="">
+                    </div>
+
+                    <div class="d-embed-footer" id="prev-footer-container" style="display: none;">
+                        <img class="d-embed-footer-icon" id="prev-footer-icon" src="" alt="">
+                        <span class="d-embed-footer-text" id="prev-footer-text"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", updatePreview);
+
+    // Lógica do View Controller
+    function switchView(mode) {
+        const editor = document.getElementById('panel-edit');
+        const preview = document.getElementById('panel-preview');
+        const btns = document.querySelectorAll('.tab-btn');
+        
+        // Reseta classes ativas
+        btns.forEach(btn => btn.classList.remove('active'));
+
+        if (mode === 'edit') {
+            editor.style.display = 'block';
+            preview.style.display = 'none';
+            document.getElementById('btn-edit').classList.add('active');
+        } else if (mode === 'preview') {
+            editor.style.display = 'none';
+            preview.style.display = 'flex';
+            document.getElementById('btn-preview').classList.add('active');
+        } else if (mode === 'split') {
+            editor.style.display = 'block';
+            preview.style.display = 'flex';
+            document.getElementById('btn-split').classList.add('active');
+        }
+    }
+
+    function addField() {
+        const container = document.getElementById('fields-container');
+        const id = Date.now();
+        const div = document.createElement('div');
+        div.className = 'field-row';
+        div.id = `f-${id}`;
+        div.innerHTML = `
+            <div><label>Nome</label><input type="text" class="f-name" oninput="updatePreview()"></div>
+            <div><label>Valor</label><input type="text" class="f-value" oninput="updatePreview()"></div>
+            <div><label>Inline?</label>
+                <select class="f-inline" onchange="updatePreview()">
+                    <option value="true">Sim</option>
+                    <option value="false">Não</option>
+                </select>
+            </div>
+            <button class="btn-del" onclick="document.getElementById('f-${id}').remove(); updatePreview();">Remover</button>
+        `;
+        container.appendChild(div);
+        updatePreview();
+    }
+
+    function setDisplay(id, show) {
+        document.getElementById(id).style.display = show ? (document.getElementById(id).tagName === 'SPAN' || document.getElementById(id).tagName === 'A' ? 'inline-block' : 'flex') : 'none';
+    }
+
+    function setText(id, text) {
+        const el = document.getElementById(id);
+        el.innerText = text;
+        return text.trim() !== "";
+    }
+
+    function setImage(id, url) {
+        const el = document.getElementById(id);
+        if (url) { el.src = url; el.style.display = 'block'; return true; }
+        else { el.style.display = 'none'; return false; }
+    }
+
+    function updatePreview() {
+        const username = document.getElementById('username').value || 'Webhook System';
+        document.getElementById('prev-username').innerText = username;
+        
+        const avatarUrl = document.getElementById('avatar_url').value;
+        document.getElementById('prev-avatar').style.backgroundImage = avatarUrl ? `url(${avatarUrl})` : '';
+
+        const content = document.getElementById('content').value;
+        document.getElementById('prev-content').innerText = content;
+        document.getElementById('prev-content').style.display = content ? 'block' : 'none';
+
+        const embedContainer = document.getElementById('prev-embed-container');
+        const color = document.getElementById('color').value;
+        const authName = document.getElementById('auth_name').value;
+        const authIcon = document.getElementById('auth_icon').value;
+        const title = document.getElementById('title').value;
+        const titleUrl = document.getElementById('title_url').value;
+        const desc = document.getElementById('description').value;
+        const thumb = document.getElementById('thumbnail').value;
+        const img = document.getElementById('image').value;
+        const footerText = document.getElementById('footer_text').value;
+        const footerIcon = document.getElementById('footer_icon').value;
+        const timestamp = document.getElementById('timestamp').value;
+
+        embedContainer.style.borderLeftColor = color;
+        let hasEmbedContent = false;
+
+        if (authName) { setDisplay('prev-auth-container', true); setText('prev-auth-name', authName); setImage('prev-auth-icon', authIcon); hasEmbedContent = true; } 
+        else { setDisplay('prev-auth-container', false); }
+
+        if (title) { setDisplay('prev-title', true); setText('prev-title', title); const titleEl = document.getElementById('prev-title'); if (titleUrl) { titleEl.href = titleUrl; titleEl.style.color = '#00A8FC'; } else { titleEl.removeAttribute('href'); titleEl.style.color = '#fff'; } hasEmbedContent = true; } 
+        else { setDisplay('prev-title', false); }
+
+        if (desc) { setDisplay('prev-desc', true); setText('prev-desc', desc); hasEmbedContent = true; } 
+        else { setDisplay('prev-desc', false); }
+
+        const fieldsContainer = document.getElementById('prev-fields');
+        fieldsContainer.innerHTML = '';
+        const fieldRows = document.querySelectorAll('.field-row');
+        if (fieldRows.length > 0) {
+            hasEmbedContent = true;
+            fieldRows.forEach(row => {
+                const name = row.querySelector('.f-name').value || '\u200B';
+                const value = row.querySelector('.f-value').value || '\u200B';
+                const inline = row.querySelector('.f-inline').value === "true";
+                const fDiv = document.createElement('div');
+                fDiv.className = `d-embed-field ${inline ? 'inline' : ''}`;
+                fDiv.innerHTML = `<div class="d-embed-field-name">${name}</div><div class="d-embed-field-value">${value}</div>`;
+                fieldsContainer.appendChild(fDiv);
+            });
+        }
+
+        if (setImage('prev-thumbnail', thumb)) hasEmbedContent = true;
+        if (setImage('prev-image', img)) hasEmbedContent = true;
+
+        let footerDisplay = '';
+        if (footerText) footerDisplay += footerText;
+        if (timestamp === 'now') {
+            const dateStr = new Date().toLocaleString('pt-BR');
+            footerDisplay += (footerDisplay ? ' • ' : '') + `Hoje às ${dateStr.split(' ')[1].substring(0,5)}`;
+        }
+
+        if (footerDisplay || footerIcon) { setDisplay('prev-footer-container', true); setText('prev-footer-text', footerDisplay); setImage('prev-footer-icon', footerIcon); hasEmbedContent = true; } 
+        else { setDisplay('prev-footer-container', false); }
+
+        embedContainer.style.display = hasEmbedContent ? 'flex' : 'none';
+    }
+
+    async function disparar() {
+        const url = document.getElementById('url').value;
+        const status = document.getElementById('status');
+        if(!url) { alert("Operação abortada: A URL do Webhook é obrigatória."); return; }
+
+        const fields = [];
+        document.querySelectorAll('.field-row').forEach(row => {
+            const name = row.querySelector('.f-name').value.trim();
+            const value = row.querySelector('.f-value').value.trim();
+            const inline = row.querySelector('.f-inline').value === "true";
+            if(name || value) fields.push({ name: name || '\u200B', value: value || '\u200B', inline });
+        });
+
+        let embed = { color: parseInt(document.getElementById('color').value.replace('#', ''), 16) };
+        let hasEmbedData = false;
+
+        const authName = document.getElementById('auth_name').value.trim();
+        if (authName) { embed.author = { name: authName }; const authUrl = document.getElementById('auth_url').value.trim(); const authIcon = document.getElementById('auth_icon').value.trim(); if (authUrl) embed.author.url = authUrl; if (authIcon) embed.author.icon_url = authIcon; hasEmbedData = true; }
+
+        const title = document.getElementById('title').value.trim();
+        if (title) { embed.title = title; hasEmbedData = true; }
+        
+        const titleUrl = document.getElementById('title_url').value.trim();
+        if (titleUrl) { embed.url = titleUrl; }
+
+        const desc = document.getElementById('description').value.trim();
+        if (desc) { embed.description = desc; hasEmbedData = true; }
+
+        if (fields.length > 0) { embed.fields = fields; hasEmbedData = true; }
+
+        const thumb = document.getElementById('thumbnail').value.trim();
+        if (thumb) { embed.thumbnail = { url: thumb }; hasEmbedData = true; }
+
+        const img = document.getElementById('image').value.trim();
+        if (img) { embed.image = { url: img }; hasEmbedData = true; }
+
+        const footerText = document.getElementById('footer_text').value.trim();
+        const footerIcon = document.getElementById('footer_icon').value.trim();
+        if (footerText || footerIcon) { embed.footer = {}; if (footerText) embed.footer.text = footerText; if (footerIcon) embed.footer.icon_url = footerIcon; hasEmbedData = true; }
+
+        if (document.getElementById('timestamp').value === "now") { embed.timestamp = new Date().toISOString(); hasEmbedData = true; }
+
+        const payload = {};
+        const username = document.getElementById('username').value.trim();
+        const avatarUrl = document.getElementById('avatar_url').value.trim();
+        const content = document.getElementById('content').value.trim();
+
+        if (username) payload.username = username;
+        if (avatarUrl) payload.avatar_url = avatarUrl;
+        if (content) payload.content = content;
+        if (hasEmbedData) payload.embeds = [embed];
+
+        if (!content && !hasEmbedData) { alert("Operação abortada: Forneça um conteúdo de texto ou configure o Embed."); return; }
+
+        status.style.display = "block";
+        status.innerText = "Transmissão em andamento...";
+        status.style.background = "#4e5058";
+        status.style.color = "#fff";
+
+        try {
+            const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (response.ok) { status.innerText = "Transmissão concluída com sucesso."; status.style.background = "var(--success)"; } 
+            else { status.innerText = `Erro de Transmissão (${response.status}): Verifique os parâmetros informados.`; status.style.background = "var(--danger)"; }
+        } catch (err) { status.innerText = "Falha crítica de rede. O servidor de destino está inacessível."; status.style.background = "var(--danger)"; }
+    }
+</script>
+
+</body>
+</html>
