@@ -1,0 +1,47 @@
+{
+  "status": {
+    "success": true,
+    "code": 200
+  },
+  "data": {
+    "name": "Katana",
+    "description": "A katana made out of regular steel, something a beginner samurai would pick.",
+    "type": "Sword",
+    "rarity": "Common",
+    "image": {
+      "rbx": "",
+      "url": "https://static.wikia.nocookie.net/roblox-blox-piece/images/e/e9/Katana.png"
+    },
+    "skills": {
+      "Z": {
+        "name": "Quiet Rush",
+        "level": 1,
+        "cooldown": 7,
+        "description": "The user dashes forward, swiftly attacking enemies in their path in a teleportation-like fashion."
+      },
+      "X": {
+        "name": "Air Slash",
+        "level": 20,
+        "cooldown": 10,
+        "description": "The user slashes through the air, unleashing a short-range air slash that strikes all enemies in its path, forcefully knocking them back."
+      }
+    },
+    "acquisition": {
+      "method": "buy",
+      "purchasable": true,
+      "value": 1000,
+      "currency": "Beli",
+      "location": "Starter Pirate/Marine Island"
+    },
+    "upgrade_system": {
+      "materials": [
+			{"Angel Wings": 5},
+			{"Leather": 5}
+		]
+    }
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "last_updated": "2026-04-16"
+  }
+}

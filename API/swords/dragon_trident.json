@@ -1,0 +1,42 @@
+{
+  "status": {
+    "success": true,
+    "code": 200
+  },
+  "data": {
+    "name": "Dragon Trident",
+    "description": "",
+    "type": "Sword",
+    "rarity": "",
+    "image": {
+      "rbx": "",
+      "url": ""
+    },
+    "skills": {
+      "Z": {
+        "name": "",
+        "cooldown": 0,
+        "description": ""
+      },
+      "X": {
+        "name": "",
+        "cooldown": 0,
+        "description": ""
+      }
+    },
+    "acquisition": {
+      "method": "",
+      "purchasable": false,
+      "value": 0,
+      "currency": "Beli",
+      "location": ""
+    },
+    "upgrade_system": {
+      "materials": []
+    }
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "last_updated": "2026-04-16"
+  }
+}
