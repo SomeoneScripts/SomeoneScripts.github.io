@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Player de Transmissão - ESPN</title>
+    <title>Player de Transmissão Multi-Canais</title>
     <style>
         * {
             margin: 0;
@@ -33,10 +33,26 @@
             align-items: center;
             justify-content: space-between;
             padding: 8px 4px;
+            flex-wrap: wrap;
+            gap: 12px;
         }
         .header h1 {
             font-size: 1.25rem;
             font-weight: 600;
+        }
+        .channel-select {
+            background-color: #1e293b;
+            color: #f8fafc;
+            border: 1px solid #334155;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .channel-select:hover {
+            border-color: #38bdf8;
         }
         .player-wrapper {
             position: relative;
@@ -61,12 +77,50 @@
 
     <div class="container">
         <div class="header">
-            <h1>Huracán vs Banfield — Transmissão</h1>
+            <h1 id="channel-title">ESPN — Transmissão</h1>
+            
+            <!-- Menu para seleção dos canais -->
+            <select id="channelSelector" class="channel-select" onchange="changeChannel()">
+                <option value="https://sporturbo.com/player/canais/dspl-espn">ESPN</option>
+                <option value="https://sporturbo.com/player/canais/dspl-espn2">ESPN 2</option>
+                <option value="https://sporturbo.com/player/canais/dspl-espn3">ESPN 3</option>
+                <option value="https://sporturbo.com/player/canais/dspl-espn4">ESPN 4</option>
+                <option value="https://sporturbo.com/player/canais/dspl-sportv">SporTV</option>
+                <option value="https://sporturbo.com/player/canais/dspl-sportv2">SporTV 2</option>
+                <option value="https://sporturbo.com/player/canais/dspl-sportv3">SporTV 3</option>
+            </select>
         </div>
+
         <div class="player-wrapper">
-            <iframe marginheight="0" marginwidth="0" src="https://sporturbo.com/player/canais/dspl-espn" scrolling="no" allowfullscreen="yes" allow="encrypted-media; picture-in-picture;" width="100%" height="100%" frameborder="0"></iframe>
+            <iframe 
+                id="mainPlayer"
+                marginheight="0" 
+                marginwidth="0" 
+                src="https://sporturbo.com/player/canais/dspl-espn" 
+                scrolling="no" 
+                allowfullscreen="yes" 
+                allow="encrypted-media; picture-in-picture;" 
+                width="100%" 
+                height="100%" 
+                frameborder="0">
+            </iframe>
         </div>
     </div>
+
+    <script>
+        function changeChannel() {
+            const selector = document.getElementById('channelSelector');
+            const player = document.getElementById('mainPlayer');
+            const title = document.getElementById('channel-title');
+            
+            // Atualiza a URL do iframe
+            player.src = selector.value;
+            
+            // Atualiza o título do canal exibido no topo
+            const selectedText = selector.options[selector.selectedIndex].text;
+            title.textContent = `${selectedText} — Transmissão`;
+        }
+    </script>
 
 </body>
 </html>
