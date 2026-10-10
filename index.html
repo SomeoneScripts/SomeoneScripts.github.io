@@ -21,9 +21,9 @@
             <textarea id="inputTexto" rows="10" cols="80" placeholder="O conteúdo do seu SRT aparecerá aqui após o upload (ou você pode colar manualmente)..."></textarea>
         </div>
         <br>
-        <button onclick="converterTexto()"> CONVERTER E GERAR LRC</button>
+        <button onclick="converterTexto()">🚀 CONVERTER E GERAR LRC</button>
         <br><br>
-        <a id="downloadLink" download="legenda.lrc" style="display:none;"> BAIXAR ARQUIVO .LRC</a>
+        <a id="downloadLink" download="legenda.lrc" style="display:none;">📥 BAIXAR ARQUIVO .LRC</a>
         <br><br>
         <div>
             <label><strong>Pré-visualização do resultado limpo:</strong></label><br>
@@ -56,8 +56,8 @@
             // ==========================================
             // COLOQUE OS SEUS CARACTERES FANTASMAS AQUI:
             // ==========================================
-            let fantasma1 = " ​​​ ​"; // Cole o primeiro caractere podre entre as aspas
-            let fantasma2 = "​"; // Cole o segundo caractere podre entre as aspas
+            let fantasma1 = "  "; // Cole o primeiro caractere aqui entre as aspas
+            let fantasma2 = " "; // Cole o segundo caractere aqui entre as aspas
 
             // Normaliza quebras de linha gerais do SRT
             texto = texto.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
@@ -75,10 +75,11 @@
                 texto = texto.replace(regex2, ' ');
             }
 
+            // Garante 1 espaço perfeito logo após o colchete e remove espaços múltiplos
             texto = texto.replace(/\]([^\s])/g, '] $1');
             texto = texto.replace(/[ \t]{2,}/g, ' ');
 
-            // PASSO 4: Lógica de remoção de linhas duplicadas consecutivas
+            // PASSO 3: Lógica de remoção de linhas duplicadas consecutivas
             let linhas = texto.split('\n');
             let linhasFiltradas = [];
 
