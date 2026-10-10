@@ -8,7 +8,7 @@
 <body>
 
     <h1>LRC Maker</h1>
-    <p>Suba seu .srt, o código limpa as tabulações, remove as repetições sequenciais e ajusta o espaçamento.</p>
+    <p>Suba seu .srt, o código corta o lixo após o colchete, remove as repetições sequenciais e ajusta o espaçamento.</p>
 
     <div>
         <div>
@@ -59,29 +59,30 @@
             // PASSO 1: Modelagem e Tempo (srt para lrc [mm:ss.xx])
             texto = texto.replace(/[0-9]+\n[0-9]{2}:([0-9]{2}:[0-9]{2}),([0-9]{2})[0-9].*\n(.*)(?:\n)*/g, '[$1.$2] $3\n');
 
-            // PASSO 2: Substitui TODAS as tabulações (\t) por espaços simples
-            texto = texto.replace(/\t+/g, ' ');
-
-            // Garante 1 espaço perfeito logo após o colchete e colapsa múltiplos espaços em um só
-            texto = texto.replace(/\]([^\s])/g, '] $1');
-            texto = texto.replace(/[ \t]{2,}/g, ' ');
+            // PASSO 2: A SACADA MESTRE! 
+            // Pega o [tempo], ignora qualquer lixo/caractere podre/espaço estúpido que vier logo em seguida, 
+            // cata o primeiro caractere real da letra e reconstrói limpo com um único espaço.
+            texto = texto.replace(/(\[[0-9]{2}:[0-9]{2}\.[0-9]{2}\])[^\S\r\n\wÀ-ÿ]*(.+)/g, '$1 $2');
 
             // PASSO 3: Lógica de remoção de linhas duplicadas consecutivas
             let linhas = texto.split('\n');
             let linhasFiltradas = [];
 
             for (let i = 0; i < linhas.length; i++) {
-                let linhaAtual = linhas[i];
+                let linhaAtual = linhas[i].trim();
+                if (!linhaAtual) continue;
                 
+                // Extrai apenas o conteúdo da letra (removendo o timestamp [mm:ss.xx] para comparar)
                 let conteudoAtual = linhaAtual.replace(/^\[[0-9]{2}:[0-9]{2}\.[0-9]{2}\]\s*/, '');
                 
-                if (i === 0) {
+                if (linhasFiltradas.length === 0) {
                     linhasFiltradas.push(linhaAtual);
                 } else {
                     let ultimaLinhaSalva = linhasFiltradas[linhasFiltradas.length - 1];
-                    let conteudoUltima = ultimaLinhaSalva ? ultimaLinhaSalva.replace(/^\[[0-9]{2}:[0-9]{2}\.[0-9]{2}\]\s*/, '') : '';
+                    let conteudoUltima = ultimaLinhaSalva.replace(/^\[[0-9]{2}:[0-9]{2}\.[0-9]{2}\]\s*/, '');
 
-                    if (conteudoAtual !== conteudoUltima || conteudoAtual === "") {
+                    // Se o texto da linha atual for diferente da última salva, adiciona
+                    if (conteudoAtual !== conteudoUltima) {
                         linhasFiltradas.push(linhaAtual);
                     }
                 }
