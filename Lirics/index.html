@@ -8,7 +8,7 @@
 <body>
 
     <h1>LRC Maker</h1>
-    <p>Suba seu .srt, o código corta o lixo entre o colchete e a letra, remove repetições e ajusta tudo.</p>
+    <p>Suba seu .srt, o código corta o lixo do começo e do fim, remove repetições e ajusta tudo.</p>
 
     <div>
         <div>
@@ -59,10 +59,10 @@
             // PASSO 1: Modelagem e Tempo (srt para lrc [mm:ss.xx])
             texto = texto.replace(/[0-9]+\n[0-9]{2}:([0-9]{2}:[0-9]{2}),([0-9]{2})[0-9].*\n(.*?)(?:\n|$)/g, '[$1.$2] $3\n');
 
-            // PASSO 2: A Solução Definitiva! Apaga tudo entre o [tempo] e a primeira letra (A-Z com acentos), deixando 1 espaço
+            // PASSO 2: Limpa tudo entre o [tempo] e a primeira letra (A-Z com acentos), deixando 1 espaço
             texto = texto.replace(/(\[[0-9]{2}:[0-9]{2}\.[0-9]{2}\])[^A-Za-zÀ-ÿ]*(.*)/g, '$1 $2');
 
-            // PASSO 3: Lógica de remoção de linhas duplicadas consecutivas e limpeza de espaços internos
+            // PASSO 3: Lógica de remoção de linhas duplicadas consecutivas e limpeza de pontas
             let linhas = texto.split('\n');
             let linhasFiltradas = [];
 
@@ -72,6 +72,9 @@
                 
                 // Normaliza múltiplos espaços internos na linha
                 linhaAtual = linhaAtual.replace(/([ \t]{2,})/g, ' ');
+
+                // Remove qualquer lixo/espaço/caractere fantasma que sobrou no final da linha
+                linhaAtual = linhaAtual.replace(/([^A-Za-zÀ-ÿ0-9?!.,'"])+$/, '');
 
                 let conteudoAtual = linhaAtual.replace(/^\[[0-9]{2}:[0-9]{2}\.[0-9]{2}\]\s*/, '');
                 
