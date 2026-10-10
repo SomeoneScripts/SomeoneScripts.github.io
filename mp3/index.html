@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LRC & ID3 Master Mobile</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/browser-id3-writer@4.0.0/dist/browser-id3-writer.min.js"></script>
+    <style>
+        body {
+            font-size: 16px;
+            padding: 15px;
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: sans-serif;
+        }
+        h1 { font-size: 22px; color: #fff; }
+        h2 { font-size: 18px; color: #4CAF50; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        .card {
+            background: #1e1e1e;
+            border: 1px solid #333;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        label { font-weight: bold; display: block; margin-top: 10px; margin-bottom: 5px; color: #ccc; }
+        input[type="text"], select, textarea {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        input[type="file"] {
+            font-size: 16px;
+            padding: 10px 0;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+        button.secondary {
+            background: #d9534f;
+            margin-top: 8px;
+        }
+        button.info {
+            background: #0275d8;
+            margin-top: 8px;
+        }
+        a.download-btn {
+            display: block;
+            text-align: center;
+            background: #ff9800;
+            color: black;
+            font-weight: bold;
+            padding: 14px;
+            margin-top: 15px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .capa-container {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        #capaPreview {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border: 2px dashed #555;
+            border-radius: 8px;
+            background: #2a2a2a;
+            display: block;
+            margin: 0 auto 10px auto;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🎵 LRC & ID3 Master Mobile</h1>
+    <p>Ferramenta completa otimizada para celular.</p>
+
+    <!-- MÓDULO MP3 / ID3 -->
+    <div class="card">
+        <h2>Módulo MP3 & Capas</h2>
+        
+        <label>1. Enviar arquivo MP3:</label>
+        <input type="file" id="inputMp3" accept=".mp3" onchange="carregarMp3(event)">
+        
+        <div id="painelEdicaoMp3" style="display: none; margin-top: 15px;">
+            <div class="capa-container">
+                <label>Capa do Álbum:</label>
+                <img id="capaPreview" src="" alt="Sem Capa">
+                <input type="file" id="inputCapa" accept="image/jpeg,image/png" onchange="carregarCapaNova(event)">
+                <button type="button" class="info" onclick="colarCapaClipboard()">📋 Colar Capa da Área de Transferência</button>
+                <button type="button" class="secondary" onclick="removerCapa()">🗑️ Remover Capa</button>
+            </div>
+
+            <label>Nome do Arquivo de Saída:</label>
+            <input type="text" id="editNomeArquivo">
+
+            <label>Título:</label>
+            <input type="text" id="editTitulo">
+
+            <label>Artista:</label>
+            <input type="text" id="editArtista">
+
+            <label>Álbum:</label>
+            <input type="text" id="editAlbum">
+
+            <label>Compositor:</label>
+            <input type="text" id="editCompositor">
+
+            <label>Ano:</label>
+            <input type="text" id="editAno">
+
+            <label>Gênero:</label>
+            <input type="text" id="editGenero">
+
+            <label>Faixa (ex: 1/12):</label>
+            <input type="text" id="editFaixa">
+
+            <label>Tipo de Letra no MP3:</label>
+            <select id="tipoLetraMp3">
+                <option value="sincronizada">Letra Sincronizada (.LRC / USLT)</option>
+                <option value="texto">Texto Comum / Livre</option>
+            </select>
+
+            <button onclick="salvarTagsMp3()">💾 Salvar Tudo e Gerar MP3</button>
+            <a id="downloadMp3Link" class="download-btn" style="display:none;">📥 BAIXAR MP3 EDITADO</a>
+        </div>
+    </div>
+
+    <!-- MÓDULO LEGENDA -->
+    <div class="card">
+        <h2>📝 Módulo Legenda (.SRT para .LRC)</h2>
+        
+        <label>1. Enviar arquivo .srt:</label>
+        <input type="file" id="inputFile" accept=".srt,.txt" onchange="carregarArquivo(event)">
+
+        <label>2. Visualizar / Editar texto:</label>
+        <textarea id="inputTexto" rows="8" placeholder="O conteúdo aparecerá aqui..."></textarea>
+
+        <button onclick="converterTexto()">🚀 CONVERTER E LIMPAR</button>
+        <a id="downloadLink" class="download-btn" style="display:none;" download="legenda.lrc">📥 BAIXAR ARQUIVO .LRC</a>
+
+        <label>Pré-visualização do Resultado:</label>
+        <textarea id="outputTexto" rows="8" readonly></textarea>
+    </div>
+
+    <script>
+        let arquivoMp3Global = null;
+        let arrayBufferMp3Global = null;
+        let novaCapaBuffer = null;
+        let novaCapaMime = null;
+        let removerCapaFlag = false;
+
+        function carregarMp3(event) {
+            const arquivo = event.target.files[0];
+            if (!arquivo) return;
+            arquivoMp3Global = arquivo;
+            removerCapaFlag = false;
+            novaCapaBuffer = null;
+
+            let nomeBase = arquivo.name.replace(/\.[^/.]+$/, "");
+            document.getElementById('editNomeArquivo').value = nomeBase + "_editado";
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                arrayBufferMp3Global = e.target.result;
+            };
+            reader.readAsArrayBuffer(arquivo);
+
+            jsmediatags.read(arquivo, {
+                onSuccess: function(tag) {
+                    const tags = tag.tags;
+                    document.getElementById('editTitulo').value = tags.title || "";
+                    document.getElementById('editArtista').value = tags.artist || "";
+                    document.getElementById('editAlbum').value = tags.album || "";
+                    document.getElementById('editCompositor').value = tags.composer || "";
+                    document.getElementById('editAno').value = tags.year || "";
+                    document.getElementById('editGenero').value = tags.genre ? tags.genre[0] : "";
+                    document.getElementById('editFaixa').value = tags.track || "";
+
+                    if (tags.picture) {
+                        const data = tags.picture.data;
+                        const format = tags.picture.format;
+                        let base64String = "";
+                        for (let i = 0; i < data.length; i++) {
+                            base64String += String.fromCharCode(data[i]);
+                        }
+                        document.getElementById('capaPreview').src = `data:${format};base64,${btoa(base64String)}`;
+                    } else {
+                        document.getElementById('capaPreview').src = "";
+                    }
+                    
+                    document.getElementById('painelEdicaoMp3').style.display = 'block';
+                },
+                onError: function(error) {
+                    document.getElementById('painelEdicaoMp3').style.display = 'block';
+                }
+            });
+        }
+
+        function carregarCapaNova(event) {
+            const arquivoCapa = event.target.files[0];
+            if (!arquivoCapa) return;
+            removerCapaFlag = false;
+            novaCapaMime = arquivoCapa.type;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                novaCapaBuffer = e.target.result;
+                document.getElementById('capaPreview').src = e.target.result;
+            };
+            reader.readAsDataURL(arquivoCapa);
+        }
+
+        async function colarCapaClipboard() {
+            try {
+                const clipboardItems = await navigator.clipboard.read();
+                for (const item of clipboardItems) {
+                    for (const type of item.types) {
+                        if (type.startsWith('image/')) {
+                            const blob = await item.getType(type);
+                            novaCapaMime = type;
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                novaCapaBuffer = e.target.result;
+                                document.getElementById('capaPreview').src = e.target.result;
+                                removerCapaFlag = false;
+                                alert("Capa colada com sucesso da área de transferência!");
+                            };
+                            reader.readAsDataURL(blob);
+                            return;
+                        }
+                    }
+                }
+                alert("Nenhuma imagem encontrada na área de transferência.");
+            } catch (err) {
+                alert("Seu navegador não permitiu ler a área de transferência diretamente. Use o botão de enviar arquivo acima.");
+            }
+        }
+
+        function removerCapa() {
+            novaCapaBuffer = null;
+            removerCapaFlag = true;
+            document.getElementById('capaPreview').src = "";
+            alert("Capa marcada para remoção.");
+        }
+
+        function salvarTagsMp3() {
+            if (!arrayBufferMp3Global) {
+                alert("Envie um arquivo MP3 primeiro!");
+                return;
+            }
+
+            try {
+                const novoNome = document.getElementById('editNomeArquivo').value || "musica_editada";
+                const titulo = document.getElementById('editTitulo').value;
+                const artista = document.getElementById('editArtista').value;
+                const album = document.getElementById('editAlbum').value;
+                const compositor = document.getElementById('editCompositor').value;
+                const ano = parseInt(document.getElementById('editAno').value) || undefined;
+                const genero = document.getElementById('editGenero').value;
+                const faixa = document.getElementById('editFaixa').value;
+                const letraLrc = document.getElementById('outputTexto').value;
+                const tipoLetra = document.getElementById('tipoLetraMp3').value;
+
+                const writer = new ID3Writer(arrayBufferMp3Global);
+
+                if (titulo) writer.setFrame('TIT2', titulo);
+                if (artista) writer.setFrame('TPE1', [artista]);
+                if (album) writer.setFrame('TALB', album);
+                if (compositor) writer.setFrame('TCOM', [compositor]);
+                if (ano) writer.setFrame('TYER', ano);
+                if (genero) writer.setFrame('TCON', [genero]);
+                if (faixa) writer.setFrame('TRCK', faixa);
+
+                if (letraLrc) {
+                    if (tipoLetra === 'sincronizada') {
+                        writer.setFrame('USLT', { description: 'LRC', lyrics: letraLrc, language: 'por' });
+                    } else {
+                        writer.setFrame('USLT', { description: 'Lyrics', lyrics: letraLrc.replace(/\[[0-9]{2}:[0-9]{2}\.[0-9]{2}\]\s*/g, ''), language: 'por' });
+                    }
+                }
+
+                if (novaCapaBuffer) {
+                    let binaryString = atob(novaCapaBuffer.split(',')[1]);
+                    let len = binaryString.length;
+                    let bytes = new Uint8Array(len);
+                    for (let i = 0; i < len; i++) {
+                        bytes[i] = binaryString.charCodeAt(i);
+                    }
+                    writer.setFrame('APIC', { type: 3, data: bytes.buffer, description: 'Cover', mime: novaCapaMime });
+                }
+
+                writer.addTag();
+                const blobMp3Editado = writer.getBlob();
+
+                const urlMp3 = URL.createObjectURL(blobMp3Editado);
+                const linkMp3 = document.getElementById('downloadMp3Link');
+                linkMp3.href = urlMp3;
+                linkMp3.download = novoNome + ".mp3";
+                linkMp3.style.display = 'block';
+
+                alert("MP3 gerado com sucesso! Role até embaixo no botão laranja para baixar.");
+            } catch (err) {
+                console.error(err);
+                alert("Erro ao processar o MP3.");
+            }
+        }
+
+        function carregarArquivo(event) {
+            const arquivo = event.target.files[0];
+            if (!arquivo) return;
+            const leitor = new FileReader();
+            leitor.onload = function(e) {
+                document.getElementById('inputTexto').value = e.target.result;
+                let nomeBase = arquivo.name.replace(/\.[^/.]+$/, "");
+                document.getElementById('downloadLink').setAttribute('download', nomeBase + '.lrc');
+            };
+            leitor.readAsText(arquivo, 'UTF-8');
+        }
+
+        function converterTexto() {
+            let texto = document.getElementById('inputTexto').value;
+            if (!texto.trim()) {
+                alert("Cole o texto ou envie um arquivo .srt!");
+                return;
+            }
+
+            texto = texto.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+            texto = texto.replace(/[0-9]+\n[0-9]{2}:([0-9]{2}:[0-9]{2}),([0-9]{2})[0-9].*\n(.*?)(?:\n|$)/g, '[$1.$2] $3\n');
+            texto = texto.replace(/(\[[0-9]{2}:[0-9]{2}\.[0-9]{2}\])[^A-Za-zÀ-ÿ]*(.*)/g, '$1 $2');
+
+            let linhas = texto.split('\n');
+            let linhasFiltradas = [];
+
+            for (let i = 0; i < linhas.length; i++) {
+                let linhaAtual = linhas[i].trim();
+                if (!linhaAtual) continue;
+                
+                linhaAtual = linhaAtual.replace(/([ \t]{2,})/g, ' ');
+                linhaAtual = linhaAtual.replace(/([^A-Za-zÀ-ÿ0-9?!.,'"])+$/, '');
+
+                let conteudoAtual = linhaAtual.replace(/^\[[0-9]{2}:[0-9]{2}\.[0-9]{2}\]\s*/, '');
+                
+                if (linhasFiltradas.length === 0) {
+                    linhasFiltradas.push(linhaAtual);
+                } else {
+                    let ultimaLinhaSalva = linhasFiltradas[linhasFiltradas.length - 1];
+                    let conteudoUltima = ultimaLinhaSalva.replace(/^\[[0-9]{2}:[0-9]{2}\.[0-9]{2}\]\s*/, '');
+
+                    if (conteudoAtual !== conteudoUltima) {
+                        linhasFiltradas.push(linhaAtual);
+                    }
+                }
+            }
+
+            let resultadoFinal = linhasFiltradas.join('\n').trim();
+            document.getElementById('outputTexto').value = resultadoFinal;
+
+            let blob = new Blob([resultadoFinal], { type: 'text/plain;charset=utf-8' });
+            let url = URL.createObjectURL(blob);
+            let linkDownload = document.getElementById('downloadLink');
+            linkDownload.href = url;
+            linkDownload.style.display = 'block';
+            
+            alert("Legenda convertida com sucesso!");
+        }
+    </script>
+</body>
+                                        </html>
+                                        
